@@ -8,11 +8,24 @@ waveChart::waveChart(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setStyleSheet("background-color: black;");
+
+    QTimer *timer_input = new QTimer(this);
+    connect(timer_input, SIGNAL(timeout()), this, SLOT(updateFrame()));
+    timer_input->start(1);
 }
 
 waveChart::~waveChart()
 {
     delete ui;
+}
+
+void waveChart::updateFrame()
+{
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec()+this->buffer[0]);
+    for (int j = 0; j < RADIUS_MAX - 1; j++)
+        this->buffer[j] = qrand() % AMPLITUDE_MAX;
+    this->update();
 }
 
 void waveChart::paintEvent(QPaintEvent *)
@@ -56,17 +69,17 @@ void waveChart::paintEvent(QPaintEvent *)
     painter.setPen(QPen(Qt::green, 1));
     int chartWidth = this->width()-leftMargin-rightMargin;
     int chartHeight = this->height()-upMargin-bottomMargin;
-    int yMax = 100;
-    int xMax = this->xList.size();
+    int yMax = AMPLITUDE_MAX;
+    int xMax = RADIUS_MAX;
     QPainterPath path;
     QPointF tmp;
     tmp.setX(leftMargin);
-    tmp.setY(upMargin+chartHeight*(yMax-this->xList[0])/yMax);
+    tmp.setY(upMargin+chartHeight*(yMax-this->buffer[0])/yMax);
     path.moveTo(tmp);
     for (int i = 1; i < xMax-1; i++)
     {
         tmp.setX(leftMargin+chartWidth*i/xMax);
-        tmp.setY(upMargin+chartHeight*(yMax-this->xList[i])/yMax);
+        tmp.setY(upMargin+chartHeight*(yMax-this->buffer[i])/yMax);
         path.lineTo(tmp);
     }
     painter.drawPath(path);

@@ -2,7 +2,8 @@
 #define WAVECHART_H
 
 #include <QWidget>
-
+#include <QTime>
+#include <QTimer>
 namespace Ui {
 class waveChart;
 }
@@ -14,10 +15,13 @@ class waveChart : public QWidget
 public:
     explicit waveChart(QWidget *parent = 0);
     void paintEvent(QPaintEvent *);
-    void appendData(int data);
     ~waveChart();
+#define RADIUS_MAX 512
+#define AMPLITUDE_MAX 100
+    int buffer[RADIUS_MAX];
 
-    QList<qreal> xList;
+private slots:
+    void updateFrame();
 
 private:
     Ui::waveChart *ui;
